@@ -3400,9 +3400,10 @@ void Tracking::CreateNewKeyFrame()
 
         
     }
-
-    // 自己加的------------------------------------------------------------------------------------------
+    // ------------------git
     mpLocalMapper->InsertKeyFrame(pKF);
+    // 自己加的------------------------------------------------------------------------------------------
+    // mpLocalMapper->InsertKeyFrame(pKF);
     // 点云地图插入关键帧
     vector<KeyFrame*> vpKFs = mpAtlas->GetAllKeyFrames();
     char tags[300]={0};

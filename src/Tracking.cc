@@ -3401,6 +3401,7 @@ void Tracking::CreateNewKeyFrame()
         
     }
     // ------------------git
+    // mpLocalMapper->InsertKeyFrame(pKF);
     mpLocalMapper->InsertKeyFrame(pKF);
     // 自己加的------------------------------------------------------------------------------------------
     // mpLocalMapper->InsertKeyFrame(pKF);

@@ -367,6 +367,15 @@ void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText)
 
 }
 
+// 自己加的-----------------------------------------------------
+void FrameDrawer::UploadResults(YOLOv5Detector *pDetector)
+{
+    unique_lock<mutex> lock(mMutex);
+    pDetector->mImage.copyTo(mImShow);
+    getResult = true;
+}
+// ------------------------------------------------------------
+
 void FrameDrawer::Update(Tracking *pTracker)
 {
     unique_lock<mutex> lock(mMutex);

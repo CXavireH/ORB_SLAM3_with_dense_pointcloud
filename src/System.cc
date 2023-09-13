@@ -33,6 +33,10 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include "pointcloudmapping.h"
+// 自己加的--------------------------------------
+#include "YOLOv5Detector.h"
+#define USE_YOLO_DETECTOR
+// ---------------------------------------------
 
 namespace ORB_SLAM3
 {
@@ -246,6 +250,15 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     // mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR, activeLC); // mSensor!=MONOCULAR);
     mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
+    // 自己加的------------------------------------------------------
+    #ifdef USE_YOLO_DETECTOR
+        std::cout << "[INFO] USE_YOLO_DETECTOR." << std::endl;
+        mpDetector = new YOLOv5Detector(mpFrameDrawer);
+        mptDetector = new thread(&ORB_SLAM3::YOLOv5Detector::Run, mpDetector);
+    #endif
+    // 自己加的-------------------------------------------------------
+
+    
     //Set pointers between threads
     //设置线程句柄
     mpTracker->SetLocalMapper(mpLocalMapper);
@@ -371,7 +384,8 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const
 
     cv::Mat imToFeed = im.clone();
     cv::Mat imDepthToFeed = depthmap.clone();
-    if(settings_ && settings_->needToResize()){
+    if(settings_ && settings_->needToResize())
+    {
         cv::Mat resizedIm;
         cv::resize(im,resizedIm,settings_->newImSize());
         imToFeed = resizedIm;
@@ -433,7 +447,7 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const
     mTrackedMapPoints = mpTracker->mCurrentFrame.mvpMapPoints;
     //当前帧的去畸变后关键点
     mTrackedKeyPointsUn = mpTracker->mCurrentFrame.mvKeysUn;
-    //返回相机的为子
+    //返回相机的位姿
     return Tcw;
 }
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 project(ORB_SLAM3)
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -9,9 +9,9 @@ MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
-set(CMAKE_CXX_STANDARD 14)
 # set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
 # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
@@ -38,16 +38,19 @@ LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 #       message(FATAL_ERROR "OpenCV > 4.4 not found.")
 #    endif()
 find_package(OpenCV)
-
 MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
-
+# 自己加的-----------------------------------------------------
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+# ------------------------------------------------------------
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(realsense2)
 # 自己加的------------------------------
 # set(PCL_ROOT "/usr/include/pcl-1.10/pcl")
 find_package(PCL 1.10 REQUIRED)
+set(Torch_DIR /usr/local/include/libtorch/share/cmake/Torch)
+find_package(Torch REQUIRED)
 # -------------------------------------
 
 include_directories(
@@ -98,6 +101,10 @@ src/Config.cc
 src/Settings.cc
 src/pointcloudmapping.cc
 src/PointCloude.cpp
+# 自己加的----------------------------
+src/YOLOv5Detector.cc
+src/YOLOv5LibTorch.cpp
+# -----------------------------------
 include/System.h
 include/Tracking.h
 include/LocalMapping.h
@@ -128,10 +135,12 @@ include/TwoViewReconstruction.h
 include/SerializationUtils.h
 include/Config.h
 include/Settings.h
+# 自己加的----------------------------------
 include/pointcloudmapping.h
 include/PointCloude.h
+include/YOLOv5Detector.h
+# -----------------------------------------
 )
-
 add_subdirectory(Thirdparty/g2o)
 
 target_link_libraries(${PROJECT_NAME}
@@ -142,6 +151,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 # 自己加的---------------------
 ${PCL_LIBRARIES}
+${TORCH_LIBRARIES}
 # ----------------------------
 -lboost_serialization
 -lcrypto

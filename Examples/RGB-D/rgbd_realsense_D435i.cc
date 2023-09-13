@@ -185,7 +185,7 @@ int main(int argc, char **argv)
     // Create a configuration for configuring the pipeline with a non default profile
     rs2::config cfg;
     // RGB stream配置对象cfg被设置为启用一个彩色图像流，分辨率为640x480，像素格式为RGB8，帧率为30帧/秒。
-    cfg.enable_stream(RS2_STREAM_COLOR,640, 480, RS2_FORMAT_RGB8, 30);
+    cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_RGB8, 30);
     // Depth stream
     /*
     
@@ -244,13 +244,13 @@ int main(int argc, char **argv)
     pipe.stop();
 
     // Align depth and RGB frames
-    //Pipeline could choose a device that does not have a color stream
-    //If there is no color stream, choose to align depth to another stream
+    // Pipeline could choose a device that does not have a color stream
+    // If there is no color stream, choose to align depth to another stream
     rs2_stream align_to = find_stream_to_align(pipe_profile.get_streams());
 
     // Create a rs2::align object.
     // rs2::align allows us to perform alignment of depth frames to others frames
-    //The "align_to" is the stream type to which we plan to align depth frames.
+    // The "align_to" is the stream type to which we plan to align depth frames.
     rs2::align align(align_to);
     rs2::frameset fsSLAM;
 
@@ -262,7 +262,6 @@ int main(int argc, char **argv)
         if(rs2::frameset fs = frame.as<rs2::frameset>())
         {
             count_im_buffer++;
-
             double new_timestamp_image = fs.get_timestamp()*1e-3;
             if(abs(timestamp_image-new_timestamp_image)<0.001){
                 count_im_buffer--;
@@ -327,7 +326,7 @@ int main(int argc, char **argv)
 
     rs2::stream_profile cam_stream = pipe_profile.get_stream(RS2_STREAM_COLOR);
 
-
+    // 读取相机内参
     rs2_intrinsics intrinsics_cam = cam_stream.as<rs2::video_stream_profile>().get_intrinsics();
     width_img = intrinsics_cam.width;
     height_img = intrinsics_cam.height;
@@ -341,7 +340,7 @@ int main(int argc, char **argv)
     intrinsics_cam.coeffs[2] << ", " << intrinsics_cam.coeffs[3] << ", " << intrinsics_cam.coeffs[4] << ", " << std::endl;
     std::cout << " Model = " << intrinsics_cam.model << std::endl;
 
-
+    // 以上皆是数据预处理
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM3::System SLAM(argv[1],argv[2],ORB_SLAM3::System::RGBD, true, 0, file_name);
     float imageScale = SLAM.GetImageScale();

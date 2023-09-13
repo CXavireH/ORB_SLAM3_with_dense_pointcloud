@@ -71,7 +71,8 @@ namespace ORB_SLAM3
                 const vector<size_t> vIndices =
                         F.GetFeaturesInArea(pMP->mTrackProjX,pMP->mTrackProjY,r*F.mvScaleFactors[nPredictedLevel],nPredictedLevel-1,nPredictedLevel);
 
-                if(!vIndices.empty()){
+                if(!vIndices.empty())
+                {
                     const cv::Mat MPdescriptor = pMP->GetDescriptor();
 
                     int bestDist=256;
@@ -219,6 +220,27 @@ namespace ORB_SLAM3
         else
             return 4.0;
     }
+
+    bool ORBmatcher::CheckDistEpipolarLine(const cv::KeyPoint &kp1,const cv::KeyPoint &kp2,const cv::Mat &F12,const KeyFrame* pKF2)
+    {
+        // Epipolar line in second image l = x1'F12 = [a b c]
+        // 计算出极线
+        const float a = kp1.pt.x*F12.at<float>(0,0)+kp1.pt.y*F12.at<float>(1,0)+F12.at<float>(2,0);
+        const float b = kp1.pt.x*F12.at<float>(0,1)+kp1.pt.y*F12.at<float>(1,1)+F12.at<float>(2,1);
+        const float c = kp1.pt.x*F12.at<float>(0,2)+kp1.pt.y*F12.at<float>(1,2)+F12.at<float>(2,2);
+
+        const float num = a*kp2.pt.x+b*kp2.pt.y+c;
+
+        const float den = a*a+b*b;
+
+        if(den==0)
+            return false;
+        // 计算到极线的距离
+        const float dsqr = num*num/den;
+        // 如果距离小于阈值则满足epipolar约束
+        return dsqr<3.84*pKF2->mvLevelSigma2[kp2.octave];
+    }
+
 
     int ORBmatcher::SearchByBoW(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPointMatches)
     {
@@ -433,6 +455,7 @@ namespace ORB_SLAM3
         const float &cx = pKF->cx;
         const float &cy = pKF->cy;
 
+        // 将一个相似性变换转化为一个三维刚体变换
         Sophus::SE3f Tcw = Sophus::SE3f(Scw.rotationMatrix(),Scw.translation()/Scw.scale());
         Eigen::Vector3f Ow = Tcw.inverse().translation();
 

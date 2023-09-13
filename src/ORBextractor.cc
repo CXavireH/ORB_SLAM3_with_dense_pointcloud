@@ -471,7 +471,7 @@ namespace ORB_SLAM3
     static void computeOrientation(const Mat& image, vector<KeyPoint>& keypoints, const vector<int>& umax)
     {
         for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
-                     keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
+            keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
         {
             keypoint->angle = IC_Angle(image, keypoint->pt, umax);
         }
@@ -535,7 +535,8 @@ namespace ORB_SLAM3
 
     }
 
-    static bool compareNodes(pair<int,ExtractorNode*>& e1, pair<int,ExtractorNode*>& e2){
+    static bool compareNodes(pair<int,ExtractorNode*>& e1, pair<int,ExtractorNode*>& e2)
+    {
         if(e1.first < e2.first){
             return true;
         }

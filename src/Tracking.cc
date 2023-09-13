@@ -3407,9 +3407,9 @@ void Tracking::CreateNewKeyFrame()
     // mpLocalMapper->InsertKeyFrame(pKF);
     // 点云地图插入关键帧
     vector<KeyFrame*> vpKFs = mpAtlas->GetAllKeyFrames();
-    char tags[300]={0};
-    sprintf(tags, "/home/rvclab/SAM/segment-anything/imgs/rgb/%d.jpg", numRGB++);
-    cv::imwrite(tags, this->mImRGB);
+    // char tags[300]={0};
+    // sprintf(tags, "/home/rvclab/SAM/segment-anything/imgs/rgb/%d.jpg", numRGB++);
+    // cv::imwrite(tags, this->mImRGB);
     mpPointCloudMapping->insertKeyFrame(pKF, this->mImRGB, this->mImDepth, idk, vpKFs);
     mpLocalMapper->SetNotStop(false);
     mnLastKeyFrameId = mCurrentFrame.mnId;

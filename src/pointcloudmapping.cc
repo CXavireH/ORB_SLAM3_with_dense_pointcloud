@@ -164,11 +164,11 @@ void PointCloudMapping::viewer()
         PointCloud::Ptr tmp  (new PointCloud);
 
         statistical_filter.setInputCloud(globalMap);
-        statistical_filter.filter( *tmp1 );
-        // voxel.setInputCloud( tmp1 );
-        // voxel.filter( *tmp );
+        statistical_filter.filter(*tmp1);
+        // voxel.setInputCloud(tmp1);
+        // voxel.filter(*tmp);
         globalMap->swap(*tmp1);
-        viewer.showCloud( globalMap );
+        viewer.showCloud(globalMap);
         // voxel.setInputCloud(globalMap);
         // voxel.filter(*tmp);
         // globalMap->swap(*tmp);

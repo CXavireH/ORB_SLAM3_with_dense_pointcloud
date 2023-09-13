@@ -94,6 +94,10 @@ namespace ORB_SLAM3
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
+
+        // 自己加的-------------------------------------------------------------------------------------------
+        bool CheckDistEpipolarLine(const cv::KeyPoint &kp1, const cv::KeyPoint &kp2, const cv::Mat &F12, const KeyFrame *pKF);
+        // --------------------------------------------------------------------------------------------------
         float RadiusByViewingCos(const float &viewCos);
 
         void ComputeThreeMaxima(std::vector<int>* histo, const int L, int &ind1, int &ind2, int &ind3);

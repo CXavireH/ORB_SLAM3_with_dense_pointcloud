@@ -41,13 +41,17 @@
 #include "Settings.h"
 // 自己加的-------------------------------------------------
 #include "pointcloudmapping.h"
-class PointCloudMapping;
+#include "YOLOv5Detector.h"
+
 // --------------------------------------------------------
 
 
 namespace ORB_SLAM3
 {
-
+// 自己加的-------------------------------------------------
+class PointCloudMapping;
+class YOLOv5Detector;
+// --------------------------------------------------------
 class Verbose
 {
 public:
@@ -245,6 +249,9 @@ private:
     std::thread* mptLocalMapping;
     std::thread* mptLoopClosing;
     std::thread* mptViewer;
+    // 自己加的------------------
+    std::thread* mptDetector;
+    // -------------------------
 
     // Reset flag
     std::mutex mMutexReset;
@@ -272,6 +279,11 @@ private:
     string mStrVocabularyFilePath;
 
     Settings* settings_;
+
+    // 自己加的------------
+    // yolov5
+    YOLOv5Detector* mpDetector;
+    // ------------------
 };
 
 }// namespace ORB_SLAM

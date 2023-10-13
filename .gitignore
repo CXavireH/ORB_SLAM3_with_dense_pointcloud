@@ -97,3 +97,6 @@ Datasets/
 result/
 TUM/
 # models/
+models/mobile_sam.onnx
+models/sam_preprocess.onnx
+models/sam_vit_h_4b8939.onnx

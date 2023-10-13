@@ -96,4 +96,4 @@ borrar/*
 Datasets/
 result/
 TUM/
-models/
+# models/

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(ORB_SLAM3)
 
 IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Release)
+        SET(CMAKE_BUILD_TYPE Release)
 ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
@@ -11,7 +11,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
 # set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
 # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
@@ -20,15 +20,15 @@ include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-   add_definitions(-D COMPILEDWITHC11)
-   message(STATUS "Using flag -std=c++11.")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+        add_definitions(-D COMPILEDWITHC11)
+        message(STATUS "Using flag -std=c++11.")
 elseif(COMPILER_SUPPORTS_CXX0X)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-   add_definitions(-DCOMPILEDWITHC0X)
-   message(STATUS "Using flag -std=c++0x.")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+        add_definitions(-DCOMPILEDWITHC0X)
+        message(STATUS "Using flag -std=c++0x.")
 else()
-   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+        message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
@@ -42,6 +42,7 @@ MESSAGE("OPENCV VERSION:")
 MESSAGE(${OpenCV_VERSION})
 # 自己加的-----------------------------------------------------
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+set(ONNXRUNTIME_DIR  "/home/rvclab/onnxruntime-linux-x64-1.15.1")
 # ------------------------------------------------------------
 find_package(Eigen3 3.1.0 REQUIRED)
 find_package(Pangolin REQUIRED)
@@ -62,11 +63,14 @@ ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
 # 自己加的-------------------
 ${PCL_INCLUDE_DIRS}
+${ONNXRUNTIME_DIR}/include
+${ONNXRUNTIME_DIR}/include
+/usr/local/include
 # -------------------------- 
 )
 # 自己加的----------------------------------------
-add_definitions( ${PCL_DEFINITIONS} )
-link_directories( ${PCL_LIBRARY_DIRS} )
+add_definitions(${PCL_DEFINITIONS})
+link_directories(${PCL_LIBRARY_DIRS})
 # -----------------------------------------------
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
@@ -104,6 +108,8 @@ src/PointCloude.cpp
 # 自己加的----------------------------
 src/YOLOv5Detector.cc
 src/YOLOv5LibTorch.cpp
+src/sam.cpp
+src/Segment.cc
 # -----------------------------------
 include/System.h
 include/Tracking.h
@@ -139,10 +145,15 @@ include/Settings.h
 include/pointcloudmapping.h
 include/PointCloude.h
 include/YOLOv5Detector.h
+include/sam.h
+include/Segment.h
 # -----------------------------------------
 )
 add_subdirectory(Thirdparty/g2o)
-
+# 自己加的----------------------------------------------------------
+set(onnxruntime_lib ${ONNXRUNTIME_DIR}/lib/libonnxruntime.so)
+# target_include_directories(${PROJECT_NAME} PRIVATE ${ONNXRUNTIME_DIR}/include)
+# ---------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
@@ -152,6 +163,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 # 自己加的---------------------
 ${PCL_LIBRARIES}
 ${TORCH_LIBRARIES}
+${onnxruntime_lib}
 # ----------------------------
 -lboost_serialization
 -lcrypto

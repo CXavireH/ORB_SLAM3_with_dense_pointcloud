@@ -42,6 +42,7 @@
 // 自己加的-------------------------------------------------
 #include "pointcloudmapping.h"
 #include "YOLOv5Detector.h"
+#include "Segment.h"
 
 // --------------------------------------------------------
 
@@ -87,6 +88,9 @@ class LocalMapping;
 class LoopClosing;
 class Settings;
 class PointCloudMapping;
+// 自己加的----------------------
+class Segment;
+// -----------------------------
 
 class System
 {
@@ -116,6 +120,9 @@ public:
     void save();
     // point cloud mapping
     shared_ptr<PointCloudMapping> mpPointCloudMapping;
+    Segment* mpSegment;
+    std::thread* mptSegment;
+    // Tracking* mpTracker;
     // --------------------------------------------
 
     // Proccess the given stereo frame. Images must be synchronized and rectified.

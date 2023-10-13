@@ -37,7 +37,7 @@
 
 // 自己加的--------------------------------------
 #include <pointcloudmapping.h>
-// #define REGISTER_TIMES
+#include "Segment.h"
 // ---------------------------------------------
 using namespace std;
 int idk = 1;
@@ -73,7 +73,8 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc,
     mbOnlyTracking(false), mbMapUpdated(false), mbVO(false), mpORBVocabulary(pVoc), mpKeyFrameDB(pKFDB),
     mbReadyToInitializate(false), mpSystem(pSys), mpViewer(NULL), bStepByStep(false),
     mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpAtlas(pAtlas), mnLastRelocFrameId(0), time_recently_lost(5.0),
-    mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL))
+    mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL)),
+    mbNewSegImgFlag(false)
 {
     // Load camera parameters from settings file
     if(settings){
@@ -1471,6 +1472,13 @@ void Tracking::SetViewer(Viewer *pViewer)
     mpViewer=pViewer;
 }
 
+// 自己加的----------------------------------------------
+void Tracking::SetSegment(Segment *segment)
+{
+    mpSegment = segment;
+}
+// -----------------------------------------------------
+
 void Tracking::SetStepByStep(bool bSet)
 {
     bStepByStep = bSet;
@@ -1583,6 +1591,7 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
     if((fabs(mDepthMapFactor-1.0f)>1e-5) || mImDepth.type()!=CV_32F)
         mImDepth.convertTo(mImDepth,CV_32F,mDepthMapFactor);
     // ------------------------------------------------------------------
+
     // 步骤3：构造Frame对象---------------------------------------------------------
     // if (mSensor == System::RGBD)
     //     mCurrentFrame = Frame(mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth,mpCamera);
@@ -1601,6 +1610,17 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
     mCurrentFrame.mNameFile = filename;
     mCurrentFrame.mnDataset = mnNumDataset;
 
+    // 自己加的---------------------------------------------------
+    while (!isNewSegmentImgArrived())   
+    {
+        usleep(1);
+    }
+    mCurrentFrame.CalculEverything(mImRGB, mImGray, mImDepth, mpSegment->mImgSegmentLatest);
+    mImS = mpSegment->mImgSegmentLatest;
+    mImS_C = mpSegment->mImgSegment_color_final;// 有待商榷
+    // ----------------------------------------------------------
+
+
 #ifdef REGISTER_TIMES
     vdORBExtract_ms.push_back(mCurrentFrame.mTimeORB_Ext);
 #endif
@@ -1609,6 +1629,28 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
     //返回当前帧的位姿
     return mCurrentFrame.GetPose();
 }
+
+// 自己加的------------------------------------
+void Tracking::GetImg(const cv::Mat &img)
+{
+    unique_lock<mutex> lock(mpSegment->mMutexGetNewImg);
+    mpSegment->mbNewImgFlag = true;
+    img.copyTo(mpSegment->mImg);
+}
+bool Tracking::isNewSegmentImgArrived()
+{
+    std::unique_lock<std::mutex> lock(mpSegment->mMutexNewImgSegment);
+    if (mbNewSegImgFlag)
+    {
+        mbNewSegImgFlag = false;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+// -------------------------------------------
 
 
 Sophus::SE3f Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp, string filename)

@@ -55,7 +55,9 @@ class LocalMapping;
 class LoopClosing;
 class System;
 class Settings;
-
+// 自己加的------------------
+class Segment;
+// -------------------------
 class Tracking
 {  
 
@@ -167,6 +169,8 @@ public:
     // 自己加的-----------------
     cv::Mat mImRGB;
     cv::Mat mImDepth;
+    cv::Mat mImS;     //segmented image
+    cv::Mat mImS_C;   //segmented image with color
     // ------------------------
 
     // Initialization Variables (Monocular)
@@ -192,6 +196,17 @@ public:
 
     void Reset(bool bLocMap = false);
     void ResetActiveMap(bool bLocMap = false);
+
+    // 自己加的-------------------------------------
+    // For the semantic segmentation thread
+    Segment *mpSegment;
+    cv::Mat mImgNew;
+    std::condition_variable mbcvImgNew;
+    void GetImg(const cv::Mat &img);
+    void SetSegment(Segment *segment);
+    bool isNewSegmentImgArrived();
+    bool mbNewSegImgFlag;
+    // -------------------------------------------
 
     float mMeanTrack;
     bool mbInitWith3KFs;

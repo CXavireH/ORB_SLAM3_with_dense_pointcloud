@@ -76,6 +76,7 @@
         "hash_map": "cpp",
         "hash_set": "cpp",
         "slist": "cpp",
-        "__nullptr": "cpp"
+        "__nullptr": "cpp",
+        "__mutex_base": "cpp"
     }
 }

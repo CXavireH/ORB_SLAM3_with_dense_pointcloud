@@ -11,7 +11,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
 # set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
 # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
@@ -106,8 +106,8 @@ src/Settings.cc
 src/pointcloudmapping.cc
 src/PointCloude.cpp
 # 自己加的----------------------------
-src/YOLOv5Detector.cc
-src/YOLOv5LibTorch.cpp
+# src/YOLOv5Detector.cc
+# src/YOLOv5LibTorch.cpp
 src/sam.cpp
 src/Segment.cc
 # -----------------------------------
@@ -144,7 +144,7 @@ include/Settings.h
 # 自己加的----------------------------------
 include/pointcloudmapping.h
 include/PointCloude.h
-include/YOLOv5Detector.h
+# include/YOLOv5Detector.h
 include/sam.h
 include/Segment.h
 # -----------------------------------------
@@ -181,7 +181,6 @@ endif()
 
 
 # Build examples
-
 # RGB-D examples
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/Examples/RGB-D)
 
@@ -434,3 +433,10 @@ if(realsense2_FOUND)
 endif()
 
 add_definitions(-DREGISTER_TIMES)
+
+
+# # 自己加的-----------------
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/evaluation)
+# add_executable(plotTrajectory evaluation/plotTrajectory.cpp)
+# target_link_libraries(plotTrajectory ${Pangolin_LIBRARIES})
+# # --------------------------

@@ -31,7 +31,7 @@
 #include <unordered_set>
 
 // 自己加的-----------------------------
-#include "YOLOv5Detector.h"
+// #include "YOLOv5Detector.h"
 // ------------------------------------
 
 
@@ -40,7 +40,7 @@ namespace ORB_SLAM3
 
 class Tracking;
 class Viewer;
-class YOLOv5Detector;
+// class YOLOv5Detector;
 
 class FrameDrawer
 {
@@ -55,37 +55,37 @@ public:
     cv::Mat DrawFrame(float imageScale=1.f);
     cv::Mat DrawRightFrame(float imageScale=1.f);
 
-    // 自己加的--------------------------------------
-    cv::Mat GetFrame()
-    {
-        unique_lock<mutex> lock(mMutex);
-        getImage = false;
-        return mIm;
-    };
+    // 自己加的YOLO--------------------------------------
+    // cv::Mat GetFrame()
+    // {
+    //     unique_lock<mutex> lock(mMutex);
+    //     getImage = false;
+    //     return mIm;
+    // };
 
-    cv::Mat GetResult()
-    {
-        unique_lock<mutex> lock(mMutex);
-        getResult = false;
-        return mImShow;
-    }
+    // cv::Mat GetResult()
+    // {
+    //     unique_lock<mutex> lock(mMutex);
+    //     getResult = false;
+    //     return mImShow;
+    // }
     
-    bool CheckImageStatus(){
-        unique_lock<mutex> lock(mMutex);
-        return getImage;
-    };
+    // bool CheckImageStatus(){
+    //     unique_lock<mutex> lock(mMutex);
+    //     return getImage;
+    // };
 
-    bool CheckResultStatus()
-    {
-        unique_lock<mutex> lock(mMutex);
-        return getResult;
-    };
+    // bool CheckResultStatus()
+    // {
+    //     unique_lock<mutex> lock(mMutex);
+    //     return getResult;
+    // };
     // ---------------------------------------------
 
     bool both;
 
     // 自己加的----------------------------------------
-    void UploadResults(YOLOv5Detector *pDetector);
+    // void UploadResults(YOLOv5Detector *pDetector);
     // -----------------------------------------------
 
 protected:
@@ -95,7 +95,7 @@ protected:
     // Info of the frame to be drawn
     cv::Mat mIm, mImRight;
     // 自己加的-----------------------------
-    cv::Mat mImShow;
+    // cv::Mat mImShow;
     // ------------------------------------
     int N;
     vector<cv::KeyPoint> mvCurrentKeys,mvCurrentKeysRight;
@@ -123,9 +123,9 @@ protected:
     map<long unsigned int, cv::Point2f> mmProjectPoints;
     map<long unsigned int, cv::Point2f> mmMatchedInImage;
 
-    // 自己加的-----------------------------------
-    bool getImage = false;
-    bool getResult = false;
+    // 自己加的YOLO-----------------------------------
+    // bool getImage = false;
+    // bool getResult = false;
     // -----------------------------------------
 
 };

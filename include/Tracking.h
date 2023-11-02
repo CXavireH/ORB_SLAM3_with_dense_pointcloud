@@ -43,6 +43,7 @@
 #include <unordered_set>
 // 自己加的-------------------------------------
 #include "pointcloudmapping.h"
+#include <condition_variable>
 // --------------------------------------------
 
 namespace ORB_SLAM3
@@ -169,8 +170,8 @@ public:
     // 自己加的-----------------
     cv::Mat mImRGB;
     cv::Mat mImDepth;
-    cv::Mat mImS;     //segmented image
-    cv::Mat mImS_C;   //segmented image with color
+    cv::Mat mImS;     //segmented image20231019
+    cv::Mat mImS_C;   //segmented image with color20231019
     // ------------------------
 
     // Initialization Variables (Monocular)

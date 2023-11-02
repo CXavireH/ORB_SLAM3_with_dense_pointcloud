@@ -37,7 +37,7 @@
 
 // 自己加的--------------------------------------
 #include <pointcloudmapping.h>
-#include "Segment.h"
+#include "Segment.h"    //20231019
 // ---------------------------------------------
 using namespace std;
 int idk = 1;
@@ -74,7 +74,7 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc,
     mbReadyToInitializate(false), mpSystem(pSys), mpViewer(NULL), bStepByStep(false),
     mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpAtlas(pAtlas), mnLastRelocFrameId(0), time_recently_lost(5.0),
     mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL)),
-    mbNewSegImgFlag(false)
+    mbNewSegImgFlag(false) //20231019
 {
     // Load camera parameters from settings file
     if(settings){
@@ -1472,7 +1472,7 @@ void Tracking::SetViewer(Viewer *pViewer)
     mpViewer=pViewer;
 }
 
-// 自己加的----------------------------------------------
+// 20231019自己加的----------------------------------------------
 void Tracking::SetSegment(Segment *segment)
 {
     mpSegment = segment;
@@ -1610,7 +1610,7 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
     mCurrentFrame.mNameFile = filename;
     mCurrentFrame.mnDataset = mnNumDataset;
 
-    // 自己加的---------------------------------------------------
+    // 20231019自己加的---------------------------------------------------
     while (!isNewSegmentImgArrived())   
     {
         usleep(1);
@@ -1630,7 +1630,7 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
     return mCurrentFrame.GetPose();
 }
 
-// 自己加的------------------------------------
+// 20231019自己加的------------------------------------
 void Tracking::GetImg(const cv::Mat &img)
 {
     unique_lock<mutex> lock(mpSegment->mMutexGetNewImg);

@@ -41,9 +41,8 @@
 #include "Settings.h"
 // 自己加的-------------------------------------------------
 #include "pointcloudmapping.h"
-#include "YOLOv5Detector.h"
+// #include "YOLOv5Detector.h"
 #include "Segment.h"
-
 // --------------------------------------------------------
 
 
@@ -51,7 +50,7 @@ namespace ORB_SLAM3
 {
 // 自己加的-------------------------------------------------
 class PointCloudMapping;
-class YOLOv5Detector;
+// class YOLOv5Detector;
 // --------------------------------------------------------
 class Verbose
 {
@@ -120,8 +119,8 @@ public:
     void save();
     // point cloud mapping
     shared_ptr<PointCloudMapping> mpPointCloudMapping;
-    Segment* mpSegment;
-    std::thread* mptSegment;
+    Segment* mpSegment;            // 20231019
+    std::thread* mptSegment;       // 20231019
     // Tracking* mpTracker;
     // --------------------------------------------
 
@@ -256,8 +255,8 @@ private:
     std::thread* mptLocalMapping;
     std::thread* mptLoopClosing;
     std::thread* mptViewer;
-    // 自己加的------------------
-    std::thread* mptDetector;
+    // 自己加的YOLO------------------
+    // std::thread* mptDetector;
     // -------------------------
 
     // Reset flag
@@ -289,7 +288,7 @@ private:
 
     // 自己加的------------
     // yolov5
-    YOLOv5Detector* mpDetector;
+    // YOLOv5Detector* mpDetector;
     // ------------------
 };
 

@@ -34,9 +34,9 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "pointcloudmapping.h"
 // 自己加的--------------------------------------
-#include "YOLOv5Detector.h"
-#include "Segment.h"
-#define USE_YOLO_DETECTOR
+// #include "YOLOv5Detector.h"
+#include "Segment.h"        // 20231019
+// #define USE_YOLO_DETECTOR
 // ---------------------------------------------
 
 namespace ORB_SLAM3
@@ -252,14 +252,14 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mptLoopClosing = new thread(&ORB_SLAM3::LoopClosing::Run, mpLoopCloser);
 
     // 自己加的------------------------------------------------------
-    #ifdef USE_YOLO_DETECTOR
-        std::cout << "[INFO] USE_YOLO_DETECTOR." << std::endl;
-        mpDetector = new YOLOv5Detector(mpFrameDrawer);
-        mptDetector = new thread(&ORB_SLAM3::YOLOv5Detector::Run, mpDetector);
-    #endif
+    // #ifdef USE_YOLO_DETECTOR
+    //     std::cout << "[INFO] USE_YOLO_DETECTOR." << std::endl;
+    //     mpDetector = new YOLOv5Detector(mpFrameDrawer);
+    //     mptDetector = new thread(&ORB_SLAM3::YOLOv5Detector::Run, mpDetector);
+    // #endif
     // 自己加的-------------------------------------------------------
 
-    // 自己加的-------------------------------------------------------
+    // 20231019自己加的-------------------------------------------------------
     // Semantic segmentation thread
     mpSegment = new Segment();
     mptSegment = new thread(&ORB_SLAM3::Segment::Run, mpSegment);
@@ -277,7 +277,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLoopCloser->SetTracker(mpTracker);
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
 
-    // 自己加的--------------------------------------
+    // 20231019自己加的--------------------------------------
     mpTracker->SetSegment(mpSegment);
     mpSegment->SetTracker(mpTracker);
     // --------------------------------------------
@@ -450,7 +450,7 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const
         for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
             mpTracker->GrabImuData(vImuMeas[i_imu]);
 
-    // 自己加的--------------------------------------------------
+    // 20231019自己加的--------------------------------------------------
     // Inform Semantic segmentation thread
     mpTracker->GetImg(im);
     // --------------------------------------------------------
@@ -596,7 +596,7 @@ void System::Shutdown()
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();
 
-    // 自己加的-----------------------------
+    // 20231019自己加的-----------------------------
     mpSegment->RequestFinish();
     // -----------------------------------
 

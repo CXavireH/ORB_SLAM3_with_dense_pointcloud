@@ -1084,6 +1084,7 @@ namespace ORB_SLAM3
             computeOrbDescriptor(keypoints[i], image, &pattern[0], descriptors.ptr((int)i));
     }
 
+    // 20231019 放开注释
     // int ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
     //                               OutputArray _descriptors, std::vector<int> &vLappingArea)
     // {
@@ -1169,7 +1170,7 @@ namespace ORB_SLAM3
     // }
 
 
-    // 自己加的------------------------------------------------------------------------------------
+    // 20231019自己加的------------------------------------------------------------------------------------20231019
     int ORBextractor::operator()(InputArray _image, InputArray _mask, vector<vector<KeyPoint>>& _keypoints,
                                  std::vector<int> &vLappingArea)
     {
@@ -1207,9 +1208,6 @@ namespace ORB_SLAM3
             _descriptors.create(nkeypoints, 32, CV_8U);
             descriptors = _descriptors.getMat();
         }
-
-        //_keypoints.clear();
-        //_keypoints.reserve(nkeypoints);
         _keypoints = vector<cv::KeyPoint>(nkeypoints);
 
         int offset = 0;

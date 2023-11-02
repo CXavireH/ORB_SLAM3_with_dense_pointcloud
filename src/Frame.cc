@@ -17,9 +17,8 @@
 */
 
 #include "Frame.h"
-
 #include "G2oTypes.h"
-#include "MapPoint.h"/home/rvclab/ORB_SLAM3/CameraTrajectory.txt
+#include "MapPoint.h"
 #include "KeyFrame.h"
 #include "ORBextractor.h"
 #include "Converter.h"
@@ -43,6 +42,9 @@ std::vector<cv::Point2f> F2_prepoint, F2_nextpoint;
 std::vector<uchar> state;
 std::vector<float> err;
 std::vector<std::vector<cv::KeyPoint>> mvAllKeysPre;
+
+// 间隔10Frames
+// int skip = 0;
 
 // ---------------------------------------------------
 
@@ -137,9 +139,10 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_StartExtORB = std::chrono::steady_clock::now();
 #endif
-    // 自己加的-----------------------------------------------
+    // // 20231019自己加的------------------------------------------------------------
     thread threadLeft(&Frame::ExtractORBKeyPoints,this,0,imLeft,0,0);
     thread threadRight(&Frame::ExtractORBKeyPoints,this,1,imRight,0,0);
+    // // --------------------------------------------------------------------
     // thread threadLeft(&Frame::ExtractORB,this,0,imLeft,0,0);
     // thread threadRight(&Frame::ExtractORB,this,1,imRight,0,0);
     threadLeft.join();
@@ -219,99 +222,104 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 }
 
 // Constructor for RGB-D cameras
-/* `Original`
-****将  Frame::Frame(...)拆分成了： 提取特征点并检测动态部分/计算静态特征点的描述子
-****即  Frame + calculeverything()    
-Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, GeometricCamera* pCamera,Frame* pPrevF, const IMU::Calib &ImuCalib)
-    :mpcpi(NULL),mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
-     mTimeStamp(timeStamp), mK(K.clone()), mK_(Converter::toMatrix3f(K)),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
-     mImuCalib(ImuCalib), mpImuPreintegrated(NULL), mpPrevFrame(pPrevF), mpImuPreintegratedFrame(NULL), mpReferenceKF(static_cast<KeyFrame*>(NULL)), mbIsSet(false), mbImuPreintegrated(false),
-     mpCamera(pCamera),mpCamera2(nullptr), mbHasPose(false), mbHasVelocity(false)
-{
-    // Frame ID
-    mnId=nNextId++;
+// `Original`
+// ****将  Frame::Frame(...)拆分成了： 提取特征点并检测动态部分/计算静态特征点的描述子
+// ****即  Frame + calculeverything()    
+// Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, GeometricCamera* pCamera,Frame* pPrevF, const IMU::Calib &ImuCalib)
+//     :mpcpi(NULL),mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
+//      mTimeStamp(timeStamp), mK(K.clone()), mK_(Converter::toMatrix3f(K)),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
+//      mImuCalib(ImuCalib), mpImuPreintegrated(NULL), mpPrevFrame(pPrevF), mpImuPreintegratedFrame(NULL), mpReferenceKF(static_cast<KeyFrame*>(NULL)), mbIsSet(false), mbImuPreintegrated(false),
+//      mpCamera(pCamera),mpCamera2(nullptr), mbHasPose(false), mbHasVelocity(false)
+// {
+//     // Frame ID
+//     mnId=nNextId++;
 
-    // Scale Level Info
-    mnScaleLevels = mpORBextractorLeft->GetLevels();  // 尺度级别
-    mfScaleFactor = mpORBextractorLeft->GetScaleFactor();  // 不用尺度级别之间的尺度因子
-    mfLogScaleFactor = log(mfScaleFactor);  // 计算了尺度因子的自然对数
-    mvScaleFactors = mpORBextractorLeft->GetScaleFactors();  // 获取所有尺度级别的尺度因子的数组
-    mvInvScaleFactors = mpORBextractorLeft->GetInverseScaleFactors();  // 获取所有尺度级别的尺度因子的倒数
-    mvLevelSigma2 = mpORBextractorLeft->GetScaleSigmaSquares();  // 获取了一个尺度Sigma平方的数组或向量。Sigma通常用于描述高斯函数的标准差，而这些Sigma值可能与不同尺度级别上应用的高斯模糊有关。
-    mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();  // 获取了尺度Sigma平方的倒数数组或向量。
+//     // Scale Level Info
+//     mnScaleLevels = mpORBextractorLeft->GetLevels();  // 尺度级别
+//     mfScaleFactor = mpORBextractorLeft->GetScaleFactor();  // 不用尺度级别之间的尺度因子
+//     mfLogScaleFactor = log(mfScaleFactor);  // 计算了尺度因子的自然对数
+//     mvScaleFactors = mpORBextractorLeft->GetScaleFactors();  // 获取所有尺度级别的尺度因子的数组
+//     mvInvScaleFactors = mpORBextractorLeft->GetInverseScaleFactors();  // 获取所有尺度级别的尺度因子的倒数
+//     mvLevelSigma2 = mpORBextractorLeft->GetScaleSigmaSquares();  // 获取了一个尺度Sigma平方的数组或向量。Sigma通常用于描述高斯函数的标准差，而这些Sigma值可能与不同尺度级别上应用的高斯模糊有关。
+//     mvInvLevelSigma2 = mpORBextractorLeft->GetInverseScaleSigmaSquares();  // 获取了尺度Sigma平方的倒数数组或向量。
 
-    // ORB extraction
-#ifdef REGISTER_TIMES
-    std::chrono::steady_clock::time_point time_StartExtORB = std::chrono::steady_clock::now();
-#endif
-    ExtractORB(0,imGray,0,0);
-#ifdef REGISTER_TIMES
-    std::chrono::steady_clock::time_point time_EndExtORB = std::chrono::steady_clock::now();
+//     // ORB extraction
+// #ifdef REGISTER_TIMES
+//     std::chrono::steady_clock::time_point time_StartExtORB = std::chrono::steady_clock::now();
+// #endif
+//     ExtractORB(0,imGray,0,0);
+// #ifdef REGISTER_TIMES
+//     std::chrono::steady_clock::time_point time_EndExtORB = std::chrono::steady_clock::now();
 
-    mTimeORB_Ext = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndExtORB - time_StartExtORB).count();
-#endif
+//     mTimeORB_Ext = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndExtORB - time_StartExtORB).count();
+// #endif
 
-    // 获取关键点数量 N，通常是图像中检测到的特征点数量
-    N = mvKeys.size();
-    // 如果特征点列表为空，就返回（不执行后续操作）
-    if(mvKeys.empty())
-        return;
-    // 对特征点进行去畸变处理
-    UndistortKeyPoints();
-    // 从RGB-D图像计算立体视觉信息
-    ComputeStereoFromRGBD(imDepth);
-    // 创建一个包含 N 个空指针的地图点指针数组
-    mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
-    // 清空两个关于投影点和匹配图像的数据结构
-    mmProjectPoints.clear();
-    mmMatchedInImage.clear();
-    // 创建一个包含 N 个布尔值的数组，用于标记哪些特征点是离群点
-    mvbOutlier = vector<bool>(N,false);
+//     // 获取关键点数量 N，通常是图像中检测到的特征点数量
+//     N = mvKeys.size();
+//     // 如果特征点列表为空，就返回（不执行后续操作）
+//     if(mvKeys.empty())
+//         return;
+//     // 对特征点进行去畸变处理
+//     UndistortKeyPoints();
+//     // 从RGB-D图像计算立体视觉信息
+//     ComputeStereoFromRGBD(imDepth);
+//     // 创建一个包含 N 个空指针的地图点指针数组
+//     mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
+//     // 清空两个关于投影点和匹配图像的数据结构
+//     mmProjectPoints.clear();
+//     mmMatchedInImage.clear();
+//     // 创建一个包含 N 个布尔值的数组，用于标记哪些特征点是离群点
+//     mvbOutlier = vector<bool>(N,false);
 
-    // This is done only for the first Frame (or after a change in the calibration)
-    // 如果是第一帧或者相机标定参数发生了变化，执行以下初始化操作
-    if(mbInitialComputations)
-    {
-        // 计算图像的边界
-        ComputeImageBounds(imGray);
-        // 计算网格的宽度和高度的倒数
-        mfGridElementWidthInv=static_cast<float>(FRAME_GRID_COLS)/static_cast<float>(mnMaxX-mnMinX);
-        mfGridElementHeightInv=static_cast<float>(FRAME_GRID_ROWS)/static_cast<float>(mnMaxY-mnMinY);
-        // 从相机内参矩阵 K 中提取一些参数
-        fx = K.at<float>(0,0);
-        fy = K.at<float>(1,1);
-        cx = K.at<float>(0,2);
-        cy = K.at<float>(1,2);
-        invfx = 1.0f/fx;
-        invfy = 1.0f/fy;
+//     // This is done only for the first Frame (or after a change in the calibration)
+//     // 如果是第一帧或者相机标定参数发生了变化，执行以下初始化操作
+//     if(mbInitialComputations)
+//     {
+//         // 计算图像的边界
+//         ComputeImageBounds(imGray);
+//         // 计算网格的宽度和高度的倒数
+//         mfGridElementWidthInv=static_cast<float>(FRAME_GRID_COLS)/static_cast<float>(mnMaxX-mnMinX);
+//         mfGridElementHeightInv=static_cast<float>(FRAME_GRID_ROWS)/static_cast<float>(mnMaxY-mnMinY);
+//         // 从相机内参矩阵 K 中提取一些参数
+//         fx = K.at<float>(0,0);
+//         fy = K.at<float>(1,1);
+//         cx = K.at<float>(0,2);
+//         cy = K.at<float>(1,2);
+//         invfx = 1.0f/fx;
+//         invfy = 1.0f/fy;
 
-        mbInitialComputations=false;
-    }
-    // 设置相机基线 mb，它是深度信息与视差信息之间的关系
-    mb = mbf/fx;
-    // 如果有上一帧的信息，将上一帧的速度信息传递给当前帧
-    if(pPrevF){
-        if(pPrevF->HasVelocity())
-            SetVelocity(pPrevF->GetVelocity());
-    }
-    else{
-        mVw.setZero();
-    }
-    // 创建一个互斥锁，用于处理IMU数据（惯性测量单元）
-    mpMutexImu = new std::mutex();
+//         mbInitialComputations=false;
+//     }
+//     // 设置相机基线 mb，它是深度信息与视差信息之间的关系
+//     mb = mbf/fx;
+//     // 如果有上一帧的信息，将上一帧的速度信息传递给当前帧
+//     if(pPrevF){
+//         if(pPrevF->HasVelocity())
+//             SetVelocity(pPrevF->GetVelocity());
+//     }
+//     else{
+//         mVw.setZero();
+//     }
+//     // 创建一个互斥锁，用于处理IMU数据（惯性测量单元）
+//     mpMutexImu = new std::mutex();
 
-    //Set no stereo fisheye information
-    Nleft = -1;
-    Nright = -1;
-    mvLeftToRightMatch = vector<int>(0);
-    mvRightToLeftMatch = vector<int>(0);
-    mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
-    monoLeft = -1;
-    monoRight = -1;
-    // 将特征点分配到网格中
-    AssignFeaturesToGrid();
-}
-*/
+//     //Set no stereo fisheye information
+//     Nleft = -1;
+//     Nright = -1;
+//     mvLeftToRightMatch = vector<int>(0);
+//     mvRightToLeftMatch = vector<int>(0);
+//     mvStereo3Dpoints = vector<Eigen::Vector3f>(0);
+//     monoLeft = -1;
+//     monoRight = -1;
+//     // 将特征点分配到网格中
+//     AssignFeaturesToGrid();
+// }
+
+// 20231019
+// Constructor for RGB-D cameras
+// `自己写的`
+// ****将  Frame::Frame(...)拆分成了： 提取特征点并检测动态部分/计算静态特征点的描述子
+// ****即  Frame + calculeverything()  
 Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeStamp, ORBextractor* extractor,ORBVocabulary* voc, cv::Mat &K, cv::Mat &distCoef, const float &bf, const float &thDepth, GeometricCamera* pCamera,Frame* pPrevF, const IMU::Calib &ImuCalib)
     :mpcpi(NULL),mpORBvocabulary(voc),mpORBextractorLeft(extractor),mpORBextractorRight(static_cast<ORBextractor*>(NULL)),
      mTimeStamp(timeStamp), mK(K.clone()), mK_(Converter::toMatrix3f(K)),mDistCoef(distCoef.clone()), mbf(bf), mThDepth(thDepth),
@@ -336,7 +344,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
 #endif
     // ExtractORB(0,imGray,0,0);
 
-    // 自己加的----------------------------
+    // 20231019自己加的----------------------------
     ExtractORBKeyPoints(0,imGray,0,0);
     // ------------------------------------
 #ifdef REGISTER_TIMES
@@ -345,7 +353,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
     mTimeORB_Ext = std::chrono::duration_cast<std::chrono::duration<double,std::milli> >(time_EndExtORB - time_StartExtORB).count();
 #endif
 
-    // 自己加的-----------------------------------------------
+    // 20231019自己加的-----------------------------------------------
     cv::Mat imGrayT = imGray;
     if (imGrayPre.data)
     {
@@ -353,15 +361,24 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imDepth, const double &timeSt
         std::swap(imGrayPre,imGrayT);
     }
     else{
+        // // 间隔10Frames---------
+        // if (skip < 6)
+        // {
+        //     flag_mov = 0;
+        //     skip++;
+        // }
+        // // --------------------
+        // else{
         std::swap(imGrayPre, imGrayT);
         flag_mov = 0;
+        // }
+
     }
     // ------------------------------------------------------
 }
 
-/*
-    处理落在动态部分的特征点,并完成之前ORBExtract函数中的剩余部分(计算描述子\assignfeaturestogrid())
-*/
+//  处理落在动态部分的特征点,并完成之前ORBExtract函数中的剩余部分(计算描述子\assignfeaturestogrid())
+
 void Frame::CalculEverything(cv::Mat &imRGB, const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imS)
 {
     // check whether there are dynamic objects
@@ -596,9 +613,9 @@ Frame::Frame(const cv::Mat &imGray, const double &timeStamp, ORBextractor* extra
     std::chrono::steady_clock::time_point time_StartExtORB = std::chrono::steady_clock::now();
 #endif
     // ExtractORB(0,imGray,0,1000);
-    // 自己加的---------------------
+    // // 20231019自己加的---------------------
     ExtractORBKeyPoints(0,imGray,0,1000);
-    // ----------------------------
+    // // ----------------------------
 #ifdef REGISTER_TIMES
     std::chrono::steady_clock::time_point time_EndExtORB = std::chrono::steady_clock::now();
 
@@ -705,10 +722,6 @@ void Frame::AssignFeaturesToGrid()
     }
 }
 
-/*  将原本void Frame::ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1)
-    拆分成提取特征点和计算描述子两部分
-
-*/
 // void Frame::ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1)
 // {
 //     vector<int> vLapping = {x0,x1};
@@ -718,7 +731,11 @@ void Frame::AssignFeaturesToGrid()
 //         monoRight = (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight,vLapping);
 // }
 
-// 自己加的-------------------------------------------------------
+/*  将原本void Frame::ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1)
+    拆分成提取特征点和计算描述子两部分
+
+*/
+// // 20231019自己加的-------------------------------------------------------
 void Frame::ExtractORBKeyPoints(int flag, const cv::Mat &imgray, const int x0, const int x1)
 {
     vector<int> vLapping = {x0, x1};
@@ -740,7 +757,7 @@ void Frame::ExtractORBDesp(int flag, const cv::Mat &imgray, const int x0, const 
 }
 
 
-// --------------------------------------------------------------
+// // --------------------------------------------------------------
 
 
 
@@ -1379,10 +1396,10 @@ Frame::Frame(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timeSt
 #endif
     // thread threadLeft(&Frame::ExtractORB,this,0,imLeft,static_cast<KannalaBrandt8*>(mpCamera)->mvLappingArea[0],static_cast<KannalaBrandt8*>(mpCamera)->mvLappingArea[1]);
     // thread threadRight(&Frame::ExtractORB,this,1,imRight,static_cast<KannalaBrandt8*>(mpCamera2)->mvLappingArea[0],static_cast<KannalaBrandt8*>(mpCamera2)->mvLappingArea[1]);
-    // 自己加的--------------------------------------------------
+    // // 20231019自己加的--------------------------------------------------
     thread threadLeft(&Frame::ExtractORBKeyPoints,this,0,imLeft,static_cast<KannalaBrandt8*>(mpCamera)->mvLappingArea[0],static_cast<KannalaBrandt8*>(mpCamera)->mvLappingArea[1]);
     thread threadRight(&Frame::ExtractORBKeyPoints,this,1,imRight,static_cast<KannalaBrandt8*>(mpCamera2)->mvLappingArea[0],static_cast<KannalaBrandt8*>(mpCamera2)->mvLappingArea[1]);
-    // ---------------------------------------------------------
+    // // ---------------------------------------------------------
     threadLeft.join();
     threadRight.join();
 #ifdef REGISTER_TIMES

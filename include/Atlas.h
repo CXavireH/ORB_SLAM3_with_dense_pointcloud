@@ -25,7 +25,6 @@
 #include "GeometricCamera.h"
 #include "Pinhole.h"
 #include "KannalaBrandt8.h"
-
 #include <set>
 #include <mutex>
 #include <boost/serialization/vector.hpp>

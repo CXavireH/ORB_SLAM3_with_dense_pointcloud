@@ -259,18 +259,6 @@ cv::Mat Sam::autoSegment(const cv::Size& numPoints, cbProgress cb, const double 
       }
       std::vector<std::vector<cv::Point>> contours;
       cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-      // cv::Mat contours_image(720, 1024, CV_8UC1, cv::Scalar(0)); // 初始为黑色背景
-      // for (size_t i = 0; i < contours.size(); ++i) {
-      //   for (size_t j = 0; j < contours[i].size(); ++j) {
-      //     cv::Point point = contours[i][j];
-      //     // 在图像上绘制白色点
-      //     cv::circle(contours_image, point, 2, cv::Scalar(255), -1); // 半径2，颜色白色，实心圆
-      //   }
-      // }
-      // cv::imshow("maskContours",contours_image);
-      // cv::waitKey(0);
-      // cv::destroyAllWindows;
-      // std::cout << "contours_size: " << contours.size() << std::endl;
       if (contours.empty()) 
       {
         continue;
@@ -280,7 +268,6 @@ cv::Mat Sam::autoSegment(const cv::Size& numPoints, cbProgress cb, const double 
       for (int i = 0; i < contours.size(); i++) 
       {
         double area = cv::contourArea(contours[i]);
-
         if (area > maxContourArea) {
           maxContourArea = area;
           maxContourIndex = i;
@@ -316,49 +303,6 @@ cv::Mat Sam::autoSegment(const cv::Size& numPoints, cbProgress cb, const double 
       masksAreas.emplace_back(maxContourArea);
     }
   }
-  // // 遍历图像并将灰度值写入文件
-  // std::ofstream outputFile("pixel_values.txt");
-  // if (!outputFile.is_open()) {
-  //     std::cerr << "无法打开输出文件。" << std::endl;
-  //     return {};
-  // }
-
-  // cv::resize(outImage, outImage, {640,480});
-  // for (int y = 0; y < outImage.rows; ++y)
-  // {
-  //     for (int x = 0; x < outImage.cols; ++x) {
-  //         double pixelValue = outImage.at<double>(y, x);
-  //         // 将灰度值写入文件
-  //         outputFile << std::setw(3) << static_cast<double>(pixelValue) << " ";
-  //     }
-  //     outputFile << std::endl;
-  // }
-  // // 关闭文件
-  // outputFile.close();
-
-
-  // cv::Mat outputImage(outImage.size(), CV_8UC1);
-  // outImage.convertTo(outputImage, CV_8UC1);
-  // cv::imwrite("outputImage.png", outputImage);
-
-  // 遍历图像并将灰度值写入文件
   cv::resize(outImage, outImage, {640,480});
-  // std::ofstream outputFile("outputImage.txt");
-  // if (!outputFile.is_open()) {
-      // std::cerr << "无法打开输出文件。" << std::endl;
-      // return {};
-  // }
-  // for (int y = 0; y < outImage.rows; ++y)
-  // {
-  //     for (int x = 0; x < outImage.cols; ++x) {
-  //         double pixelValue = outImage.at<double>(y, x);
-  //         // 将灰度值写入文件
-  //         outputFile << std::setw(3) << static_cast<double>(pixelValue) << " ";
-  //     }
-  //     outputFile << std::endl;
-  // }
-  // // 关闭文件
-  // outputFile.close();
-
   return outImage;
 }

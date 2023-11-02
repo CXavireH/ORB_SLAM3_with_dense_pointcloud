@@ -54,10 +54,11 @@ public:
     // Compute the ORB features and descriptors on an image.
     // ORB are dispersed on the image using an octree.
     // Mask is ignored in the current implementation.
+    // 20231019 放开注释
     // int operator()( cv::InputArray _image, cv::InputArray _mask,
     //                 std::vector<cv::KeyPoint>& _keypoints,
     //                 cv::OutputArray _descriptors, std::vector<int> &vLappingArea);
-    // 自己写的------------------------------------------------------------------------------
+    // 自己写的------------------------------------------------------------------------------20231019
     int operator()( cv::InputArray _image, cv::InputArray _mask,
                     std::vector<std::vector<cv::KeyPoint>>& _keypoints,
                     std::vector<int> &vLappingArea);

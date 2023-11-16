@@ -49,8 +49,8 @@ class KeyFrame;
 class ConstraintPoseImu;
 class GeometricCamera;
 class ORBextractor;
-// 自己加的------------------
-class Segment;
+// 自己加的 to orb anno------------------
+// class Segment;
 // -------------------------
 
 class Frame
@@ -74,23 +74,23 @@ public:
     // ~Frame();
 
     // Extract ORB on the image. 0 for left image and 1 for right image.
-    // 自己加的---注释的
-    // void ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1);
+    // 自己加的 to orb free---
+    void ExtractORB(int flag, const cv::Mat &im, const int x0, const int x1);
 
-    // 自己加的----------------------------------------
-    void ExtractORBKeyPoints(int flag, const cv::Mat &imgray, const int x0, const int x1);
-    void ExtractORBDesp(int flag, const cv::Mat &imgray, const int x0, const int x1);
-    void ProcessMovingObject(const cv::Mat &imgray);
-    std::vector<cv::Point2f> T_M;   // Outliers
+    // // 自己加的to orb anno----------------------------------------
+    // void ExtractORBKeyPoints(int flag, const cv::Mat &imgray, const int x0, const int x1);
+    // void ExtractORBDesp(int flag, const cv::Mat &imgray, const int x0, const int x1);
+    // void ProcessMovingObject(const cv::Mat &imgray);
+    // std::vector<cv::Point2f> T_M;   // Outliers
     
-    std::vector<std::vector<cv::KeyPoint>> mvKeysTemp;
-    double limit_dis_epi = 1.0;
-    double limit_of_check = 2120;
-    int limit_edge_corner = 5;
-    int flag_mov;
+    // std::vector<std::vector<cv::KeyPoint>> mvKeysTemp;
+    // double limit_dis_epi = 1.0;
+    // double limit_of_check = 2120;
+    // int limit_edge_corner = 5;
+    // int flag_mov;
 
-    void CalculEverything(cv::Mat &imRGB, const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imS);
-    //------------------------------------------------
+    // void CalculEverything(cv::Mat &imRGB, const cv::Mat &imGray, const cv::Mat &imDepth, const cv::Mat &imS);
+    // //------------------------------------------------
 
 
     // Compute Bag of Words representation.

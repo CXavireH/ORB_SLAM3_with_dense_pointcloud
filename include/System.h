@@ -42,7 +42,8 @@
 // 自己加的-------------------------------------------------
 #include "pointcloudmapping.h"
 // #include "YOLOv5Detector.h"
-#include "Segment.h"
+// to orb anno
+// #include "Segment.h"
 // --------------------------------------------------------
 
 
@@ -87,8 +88,8 @@ class LocalMapping;
 class LoopClosing;
 class Settings;
 class PointCloudMapping;
-// 自己加的----------------------
-class Segment;
+// 自己加的 to orb anno----------------------
+// class Segment;
 // -----------------------------
 
 class System
@@ -119,8 +120,8 @@ public:
     void save();
     // point cloud mapping
     shared_ptr<PointCloudMapping> mpPointCloudMapping;
-    Segment* mpSegment;            // 20231019
-    std::thread* mptSegment;       // 20231019
+    // Segment* mpSegment;            // 自己 to orb anno
+    // std::thread* mptSegment;       // 自己 to orb anno
     // Tracking* mpTracker;
     // --------------------------------------------
 

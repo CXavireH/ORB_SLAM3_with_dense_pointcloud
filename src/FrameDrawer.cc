@@ -367,7 +367,7 @@ void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText)
 
 }
 
-// 自己加的-----------------------------------------------------
+// 自己加的YOLO-----------------------------------------------------
 // void FrameDrawer::UploadResults(YOLOv5Detector *pDetector)
 // {
 //     unique_lock<mutex> lock(mMutex);

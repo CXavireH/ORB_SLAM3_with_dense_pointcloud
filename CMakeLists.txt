@@ -108,8 +108,10 @@ src/PointCloude.cpp
 # 自己加的----------------------------
 # src/YOLOv5Detector.cc
 # src/YOLOv5LibTorch.cpp
-src/sam.cpp
-src/Segment.cc
+
+# to orb anno
+# src/sam.cpp 
+# src/Segment.cc
 # -----------------------------------
 include/System.h
 include/Tracking.h
@@ -145,8 +147,8 @@ include/Settings.h
 include/pointcloudmapping.h
 include/PointCloude.h
 # include/YOLOv5Detector.h
-include/sam.h
-include/Segment.h
+# include/sam.h
+# include/Segment.h
 # -----------------------------------------
 )
 add_subdirectory(Thirdparty/g2o)

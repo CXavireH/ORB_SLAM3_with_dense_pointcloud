@@ -35,7 +35,7 @@
 #include "pointcloudmapping.h"
 // 自己加的--------------------------------------
 // #include "YOLOv5Detector.h"
-#include "Segment.h"        // 20231019
+// #include "Segment.h"        // to orb anno
 // #define USE_YOLO_DETECTOR
 // ---------------------------------------------
 
@@ -259,10 +259,10 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     // #endif
     // 自己加的-------------------------------------------------------
 
-    // 20231019自己加的-------------------------------------------------------
+    // 自己加的 to orb anno-------------------------------------------------------
     // Semantic segmentation thread
-    mpSegment = new Segment();
-    mptSegment = new thread(&ORB_SLAM3::Segment::Run, mpSegment);
+    // mpSegment = new Segment();
+    // mptSegment = new thread(&ORB_SLAM3::Segment::Run, mpSegment);
     // --------------------------------------------------------------
 
     
@@ -277,9 +277,9 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLoopCloser->SetTracker(mpTracker);
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
 
-    // 20231019自己加的--------------------------------------
-    mpTracker->SetSegment(mpSegment);
-    mpSegment->SetTracker(mpTracker);
+    // 自己加的to orb anno--------------------------------------
+    // mpTracker->SetSegment(mpSegment);
+    // mpSegment->SetTracker(mpTracker);
     // --------------------------------------------
 
 
@@ -450,9 +450,9 @@ Sophus::SE3f System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const
         for(size_t i_imu = 0; i_imu < vImuMeas.size(); i_imu++)
             mpTracker->GrabImuData(vImuMeas[i_imu]);
 
-    // 20231019自己加的--------------------------------------------------
+    // 自己加的 to orb anno--------------------------------------------------
     // Inform Semantic segmentation thread
-    mpTracker->GetImg(im);
+    // mpTracker->GetImg(im);
     // --------------------------------------------------------
 
     //开始跟踪，返回相机位姿
@@ -596,8 +596,8 @@ void System::Shutdown()
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();
 
-    // 20231019自己加的-----------------------------
-    mpSegment->RequestFinish();
+    // 自己加的 to orb anno-----------------------------
+    // mpSegment->RequestFinish();
     // -----------------------------------
 
     // 自己加的-----------------------------------------

@@ -37,7 +37,7 @@
 
 // 自己加的--------------------------------------
 #include <pointcloudmapping.h>
-#include "Segment.h"    //20231019
+// #include "Segment.h"    //to orb anno
 // ---------------------------------------------
 using namespace std;
 int idk = 1;
@@ -73,8 +73,8 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc,
     mbOnlyTracking(false), mbMapUpdated(false), mbVO(false), mpORBVocabulary(pVoc), mpKeyFrameDB(pKFDB),
     mbReadyToInitializate(false), mpSystem(pSys), mpViewer(NULL), bStepByStep(false),
     mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpAtlas(pAtlas), mnLastRelocFrameId(0), time_recently_lost(5.0),
-    mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL)),
-    mbNewSegImgFlag(false) //20231019
+    mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL))
+    // mbNewSegImgFlag(false) //自己加的 to orb anno
 {
     // Load camera parameters from settings file
     if(settings){
@@ -1472,11 +1472,11 @@ void Tracking::SetViewer(Viewer *pViewer)
     mpViewer=pViewer;
 }
 
-// 20231019自己加的----------------------------------------------
-void Tracking::SetSegment(Segment *segment)
-{
-    mpSegment = segment;
-}
+// 自己加的 to orb anno----------------------------------------------
+// void Tracking::SetSegment(Segment *segment)
+// {
+//     mpSegment = segment;
+// }
 // -----------------------------------------------------
 
 void Tracking::SetStepByStep(bool bSet)
@@ -1610,14 +1610,14 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
     mCurrentFrame.mNameFile = filename;
     mCurrentFrame.mnDataset = mnNumDataset;
 
-    // 20231019自己加的---------------------------------------------------
-    while (!isNewSegmentImgArrived())   
-    {
-        usleep(1);
-    }
-    mCurrentFrame.CalculEverything(mImRGB, mImGray, mImDepth, mpSegment->mImgSegmentLatest);
-    mImS = mpSegment->mImgSegmentLatest;
-    mImS_C = mpSegment->mImgSegment_color_final;// 有待商榷
+    // 自己加的 to orb anno---------------------------------------------------
+    // while (!isNewSegmentImgArrived())   
+    // {
+    //     usleep(1);
+    // }
+    // mCurrentFrame.CalculEverything(mImRGB, mImGray, mImDepth, mpSegment->mImgSegmentLatest);
+    // mImS = mpSegment->mImgSegmentLatest;
+    // mImS_C = mpSegment->mImgSegment_color_final;// 有待商榷
     // ----------------------------------------------------------
 
 
@@ -1630,26 +1630,26 @@ Sophus::SE3f Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, co
     return mCurrentFrame.GetPose();
 }
 
-// 20231019自己加的------------------------------------
-void Tracking::GetImg(const cv::Mat &img)
-{
-    unique_lock<mutex> lock(mpSegment->mMutexGetNewImg);
-    mpSegment->mbNewImgFlag = true;
-    img.copyTo(mpSegment->mImg);
-}
-bool Tracking::isNewSegmentImgArrived()
-{
-    std::unique_lock<std::mutex> lock(mpSegment->mMutexNewImgSegment);
-    if (mbNewSegImgFlag)
-    {
-        mbNewSegImgFlag = false;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
+// 自己加的to orb anno ------------------------------------
+// void Tracking::GetImg(const cv::Mat &img)
+// {
+//     unique_lock<mutex> lock(mpSegment->mMutexGetNewImg);
+//     mpSegment->mbNewImgFlag = true;
+//     img.copyTo(mpSegment->mImg);
+// }
+// bool Tracking::isNewSegmentImgArrived()
+// {
+//     std::unique_lock<std::mutex> lock(mpSegment->mMutexNewImgSegment);
+//     if (mbNewSegImgFlag)
+//     {
+//         mbNewSegImgFlag = false;
+//         return true;
+//     }
+//     else
+//     {
+//         return false;
+//     }
+// }
 // -------------------------------------------
 
 

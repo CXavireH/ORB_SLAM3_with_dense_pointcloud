@@ -1084,123 +1084,29 @@ namespace ORB_SLAM3
             computeOrbDescriptor(keypoints[i], image, &pattern[0], descriptors.ptr((int)i));
     }
 
-    // 20231019 放开注释
-    // int ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
-    //                               OutputArray _descriptors, std::vector<int> &vLappingArea)
-    // {
-    //     //cout << "[ORBextractor]: Max Features: " << nfeatures << endl;
-    //     if(_image.empty())
-    //         return -1;
-
-    //     Mat image = _image.getMat();
-    //     assert(image.type() == CV_8UC1 );
-
-    //     // Pre-compute the scale pyramid
-    //     ComputePyramid(image);
-
-    //     vector < vector<KeyPoint> > allKeypoints;
-    //     ComputeKeyPointsOctTree(allKeypoints);
-    //     //ComputeKeyPointsOld(allKeypoints);
-
-    //     Mat descriptors;
-
-    //     int nkeypoints = 0;
-    //     for (int level = 0; level < nlevels; ++level)
-    //         nkeypoints += (int)allKeypoints[level].size();
-    //     if( nkeypoints == 0 )
-    //         _descriptors.release();
-    //     else
-    //     {
-    //         _descriptors.create(nkeypoints, 32, CV_8U);
-    //         descriptors = _descriptors.getMat();
-    //     }
-
-    //     //_keypoints.clear();
-    //     //_keypoints.reserve(nkeypoints);
-    //     _keypoints = vector<cv::KeyPoint>(nkeypoints);
-
-    //     int offset = 0;
-    //     //Modified for speeding up stereo fisheye matching
-    //     int monoIndex = 0, stereoIndex = nkeypoints-1;
-    //     for (int level = 0; level < nlevels; ++level)
-    //     {
-    //         vector<KeyPoint>& keypoints = allKeypoints[level];
-    //         int nkeypointsLevel = (int)keypoints.size();
-
-    //         if(nkeypointsLevel==0)
-    //             continue;
-
-    //         // preprocess the resized image
-    //         Mat workingMat = mvImagePyramid[level].clone();
-    //         GaussianBlur(workingMat, workingMat, Size(7, 7), 2, 2, BORDER_REFLECT_101);
-
-    //         // Compute the descriptors
-    //         //Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
-    //         Mat desc = cv::Mat(nkeypointsLevel, 32, CV_8U);
-    //         computeDescriptors(workingMat, keypoints, desc, pattern);
-
-    //         offset += nkeypointsLevel;
-
-
-    //         float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
-    //         int i = 0;
-    //         for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
-    //                      keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint){
-
-    //             // Scale keypoint coordinates
-    //             if (level != 0){
-    //                 keypoint->pt *= scale;
-    //             }
-
-    //             if(keypoint->pt.x >= vLappingArea[0] && keypoint->pt.x <= vLappingArea[1]){
-    //                 _keypoints.at(stereoIndex) = (*keypoint);
-    //                 desc.row(i).copyTo(descriptors.row(stereoIndex));
-    //                 stereoIndex--;
-    //             }
-    //             else{
-    //                 _keypoints.at(monoIndex) = (*keypoint);
-    //                 desc.row(i).copyTo(descriptors.row(monoIndex));
-    //                 monoIndex++;
-    //             }
-    //             i++;
-    //         }
-    //     }
-    //     //cout << "[ORBextractor]: extracted " << _keypoints.size() << " KeyPoints" << endl;
-    //     return monoIndex;
-    // }
-
-
-    // 20231019自己加的------------------------------------------------------------------------------------20231019
-    int ORBextractor::operator()(InputArray _image, InputArray _mask, vector<vector<KeyPoint>>& _keypoints,
-                                 std::vector<int> &vLappingArea)
+    // 自己 to orb free
+    int ORBextractor::operator()( InputArray _image, InputArray _mask, vector<KeyPoint>& _keypoints,
+                                  OutputArray _descriptors, std::vector<int> &vLappingArea)
     {
         //cout << "[ORBextractor]: Max Features: " << nfeatures << endl;
         if(_image.empty())
             return -1;
 
         Mat image = _image.getMat();
-        assert(image.type() == CV_8UC1);
+        assert(image.type() == CV_8UC1 );
 
         // Pre-compute the scale pyramid
         ComputePyramid(image);
-        // vector < vector<KeyPoint> > allKeypoints;
-        ComputeKeyPointsOctTree(_keypoints);
-        //ComputeKeyPointsOld(allKeypoints);
-        int nkeypoints = 0;
-        for (int level = 0; level < nlevels; ++level)
-            nkeypoints += (int)_keypoints[level].size();
-        return nkeypoints;
-    }
 
-    int ORBextractor::ProcessDesp(InputArray _image, InputArray _mask,
-                                  vector<vector<cv::KeyPoint>> &_allKeypoints,
-                                  vector<KeyPoint> &_keypoints, 
-                                  OutputArray _descriptors, std::vector<int> &vLappingArea)
-    {
+        vector < vector<KeyPoint> > allKeypoints;
+        ComputeKeyPointsOctTree(allKeypoints);
+        //ComputeKeyPointsOld(allKeypoints);
+
         Mat descriptors;
+
         int nkeypoints = 0;
         for (int level = 0; level < nlevels; ++level)
-            nkeypoints += (int)_allKeypoints[level].size();
+            nkeypoints += (int)allKeypoints[level].size();
         if( nkeypoints == 0 )
             _descriptors.release();
         else
@@ -1208,6 +1114,9 @@ namespace ORB_SLAM3
             _descriptors.create(nkeypoints, 32, CV_8U);
             descriptors = _descriptors.getMat();
         }
+
+        //_keypoints.clear();
+        //_keypoints.reserve(nkeypoints);
         _keypoints = vector<cv::KeyPoint>(nkeypoints);
 
         int offset = 0;
@@ -1215,7 +1124,7 @@ namespace ORB_SLAM3
         int monoIndex = 0, stereoIndex = nkeypoints-1;
         for (int level = 0; level < nlevels; ++level)
         {
-            vector<KeyPoint>& keypoints = _allKeypoints[level];
+            vector<KeyPoint>& keypoints = allKeypoints[level];
             int nkeypointsLevel = (int)keypoints.size();
 
             if(nkeypointsLevel==0)
@@ -1236,8 +1145,8 @@ namespace ORB_SLAM3
             float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
             int i = 0;
             for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
-                         keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
-            {
+                         keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint){
+
                 // Scale keypoint coordinates
                 if (level != 0){
                     keypoint->pt *= scale;
@@ -1260,62 +1169,153 @@ namespace ORB_SLAM3
         return monoIndex;
     }
 
-    int ORBextractor::CheckMovingKeyPoints(const cv::Mat &imGray, const cv::Mat &imS, std::vector<std::vector<cv::KeyPoint>> &mvKeysT, std::vector<cv::Point2f> T)
-    {
-        float scale;
-        int flag_orb_mov = 0;
-        // find the moving objects labels
-        std::vector<double> labels;
-        for(int i = 0; i < T.size(); i++){
-            int my = (int)T[i].y;
-            int mx = (int)T[i].x;
-            double label = imS.ptr<double>(my)[mx];
-            if (std::find(labels.begin(), labels.end(), label) == labels.end())
-            {
-                labels.push_back(label);
-            }
-        }
-        if (T.size()){
-            flag_orb_mov = 1;
-        }
-        // Removing dynamic points
-        if (flag_orb_mov == 1)
-        {
-            for (int level = 0; level < nlevels; ++level)
-            {
-                vector<cv::KeyPoint> &mkeypoints = mvKeysT[level];
-                int nkeypointsLevel = (int)mkeypoints.size();
-                if (nkeypointsLevel == 0)
-                    continue;
-                if (level != 0)
-                    scale = mvScaleFactor[level];
-                else
-                    scale = 1;
-                vector<cv::KeyPoint>::iterator keypoint = mkeypoints.begin();
-                while (keypoint != mkeypoints.end())
-                {
-                    cv::Point2f search_coord = keypoint -> pt * scale;
-                    // Search in the semantic image
-                    if (search_coord.x >= (imGray.cols - 1))
-                        search_coord.x = (imGray.cols - 1);
-                    if (search_coord.y >= (imGray.rows - 1))
-                        search_coord.y = (imGray.rows - 1);
-                    double label_coord = imS.ptr<double>((int)search_coord.y)[(int)search_coord.x];
-                    auto it = std::find(labels.begin(), labels.end(), label_coord);
-                    bool movingFlag = (it != labels.end());
-                    if (movingFlag)
-                    {
-                        keypoint = mkeypoints.erase(keypoint);
-                    }
-                    else
-                    {
-                        keypoint++;
-                    }
-                }
-            }
-        }
-        return flag_orb_mov;
-    }
+
+    // 自己加的to orb anno------------------------------------------------------------------------------------20231019
+    // int ORBextractor::operator()(InputArray _image, InputArray _mask, vector<vector<KeyPoint>>& _keypoints,
+    //                              std::vector<int> &vLappingArea)
+    // {
+    //     //cout << "[ORBextractor]: Max Features: " << nfeatures << endl;
+    //     if(_image.empty())
+    //         return -1;
+
+    //     Mat image = _image.getMat();
+    //     assert(image.type() == CV_8UC1);
+
+    //     // Pre-compute the scale pyramid
+    //     ComputePyramid(image);
+    //     // vector < vector<KeyPoint> > allKeypoints;
+    //     ComputeKeyPointsOctTree(_keypoints);
+    //     //ComputeKeyPointsOld(allKeypoints);
+    //     int nkeypoints = 0;
+    //     for (int level = 0; level < nlevels; ++level)
+    //         nkeypoints += (int)_keypoints[level].size();
+    //     return nkeypoints;
+    // }
+
+    // int ORBextractor::ProcessDesp(InputArray _image, InputArray _mask,
+    //                               vector<vector<cv::KeyPoint>> &_allKeypoints,
+    //                               vector<KeyPoint> &_keypoints, 
+    //                               OutputArray _descriptors, std::vector<int> &vLappingArea)
+    // {
+    //     Mat descriptors;
+    //     int nkeypoints = 0;
+    //     for (int level = 0; level < nlevels; ++level)
+    //         nkeypoints += (int)_allKeypoints[level].size();
+    //     if( nkeypoints == 0 )
+    //         _descriptors.release();
+    //     else
+    //     {
+    //         _descriptors.create(nkeypoints, 32, CV_8U);
+    //         descriptors = _descriptors.getMat();
+    //     }
+    //     _keypoints = vector<cv::KeyPoint>(nkeypoints);
+
+    //     int offset = 0;
+    //     //Modified for speeding up stereo fisheye matching
+    //     int monoIndex = 0, stereoIndex = nkeypoints-1;
+    //     for (int level = 0; level < nlevels; ++level)
+    //     {
+    //         vector<KeyPoint>& keypoints = _allKeypoints[level];
+    //         int nkeypointsLevel = (int)keypoints.size();
+
+    //         if(nkeypointsLevel==0)
+    //             continue;
+
+    //         // preprocess the resized image
+    //         Mat workingMat = mvImagePyramid[level].clone();
+    //         GaussianBlur(workingMat, workingMat, Size(7, 7), 2, 2, BORDER_REFLECT_101);
+
+    //         // Compute the descriptors
+    //         //Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
+    //         Mat desc = cv::Mat(nkeypointsLevel, 32, CV_8U);
+    //         computeDescriptors(workingMat, keypoints, desc, pattern);
+
+    //         offset += nkeypointsLevel;
+
+
+    //         float scale = mvScaleFactor[level]; //getScale(level, firstLevel, scaleFactor);
+    //         int i = 0;
+    //         for (vector<KeyPoint>::iterator keypoint = keypoints.begin(),
+    //                      keypointEnd = keypoints.end(); keypoint != keypointEnd; ++keypoint)
+    //         {
+    //             // Scale keypoint coordinates
+    //             if (level != 0){
+    //                 keypoint->pt *= scale;
+    //             }
+
+    //             if(keypoint->pt.x >= vLappingArea[0] && keypoint->pt.x <= vLappingArea[1]){
+    //                 _keypoints.at(stereoIndex) = (*keypoint);
+    //                 desc.row(i).copyTo(descriptors.row(stereoIndex));
+    //                 stereoIndex--;
+    //             }
+    //             else{
+    //                 _keypoints.at(monoIndex) = (*keypoint);
+    //                 desc.row(i).copyTo(descriptors.row(monoIndex));
+    //                 monoIndex++;
+    //             }
+    //             i++;
+    //         }
+    //     }
+    //     //cout << "[ORBextractor]: extracted " << _keypoints.size() << " KeyPoints" << endl;
+    //     return monoIndex;
+    // }
+
+    // int ORBextractor::CheckMovingKeyPoints(const cv::Mat &imGray, const cv::Mat &imS, std::vector<std::vector<cv::KeyPoint>> &mvKeysT, std::vector<cv::Point2f> T)
+    // {
+    //     float scale;
+    //     int flag_orb_mov = 0;
+    //     // find the moving objects labels
+    //     std::vector<double> labels;
+    //     for(int i = 0; i < T.size(); i++){
+    //         int my = (int)T[i].y;
+    //         int mx = (int)T[i].x;
+    //         double label = imS.ptr<double>(my)[mx];
+    //         if (std::find(labels.begin(), labels.end(), label) == labels.end())
+    //         {
+    //             labels.push_back(label);
+    //         }
+    //     }
+    //     if (T.size()){
+    //         flag_orb_mov = 1;
+    //     }
+    //     // Removing dynamic points
+    //     if (flag_orb_mov == 1)
+    //     {
+    //         for (int level = 0; level < nlevels; ++level)
+    //         {
+    //             vector<cv::KeyPoint> &mkeypoints = mvKeysT[level];
+    //             int nkeypointsLevel = (int)mkeypoints.size();
+    //             if (nkeypointsLevel == 0)
+    //                 continue;
+    //             if (level != 0)
+    //                 scale = mvScaleFactor[level];
+    //             else
+    //                 scale = 1;
+    //             vector<cv::KeyPoint>::iterator keypoint = mkeypoints.begin();
+    //             while (keypoint != mkeypoints.end())
+    //             {
+    //                 cv::Point2f search_coord = keypoint -> pt * scale;
+    //                 // Search in the semantic image
+    //                 if (search_coord.x >= (imGray.cols - 1))
+    //                     search_coord.x = (imGray.cols - 1);
+    //                 if (search_coord.y >= (imGray.rows - 1))
+    //                     search_coord.y = (imGray.rows - 1);
+    //                 double label_coord = imS.ptr<double>((int)search_coord.y)[(int)search_coord.x];
+    //                 auto it = std::find(labels.begin(), labels.end(), label_coord);
+    //                 bool movingFlag = (it != labels.end());
+    //                 if (movingFlag)
+    //                 {
+    //                     keypoint = mkeypoints.erase(keypoint);
+    //                 }
+    //                 else
+    //                 {
+    //                     keypoint++;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return flag_orb_mov;
+    // }
     // -------------------------------------------------------------------------------------------
     
     

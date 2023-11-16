@@ -96,13 +96,6 @@ borrar/*
 Datasets/
 result/
 TUM/
-<<<<<<< HEAD
+models/
 BONN/
 evaluation/
-models/
-=======
-# models/
-# models/mobile_sam.onnx
-models/sam_preprocess.onnx
-# models/sam_vit_h_4b8939.onnx
->>>>>>> parent of f17b06d... pushmodelfinish
